@@ -11,25 +11,23 @@ class FavoritPage extends StatefulWidget {
   State<FavoritPage> createState() => _FavoritPageState();
 }
 
-// Gunakan 'AutomaticKeepAliveClientMixin' agar state tidak hilang saat ganti tab
 class _FavoritPageState extends State<FavoritPage>
     with AutomaticKeepAliveClientMixin {
-  late Future<List<TempatWisataModel>> _futureFavorit;
+      
+  Future<List<TempatWisataModel>>? _futureFavorit;
   final ApiService _apiService = ApiService();
 
   @override
   void initState() {
     super.initState();
-    _loadFavorit();
-  }
-
-  void _loadFavorit() {
+    // Assign future langsung di sini
     _futureFavorit = _apiService.getFavorit();
   }
 
+  // _onRetry harus me-reset future
   void _onRetry() {
     setState(() {
-      _loadFavorit();
+      _futureFavorit = _apiService.getFavorit();
     });
   }
 
@@ -53,7 +51,7 @@ class _FavoritPageState extends State<FavoritPage>
       body: RefreshIndicator(
         onRefresh: () async => _onRetry(),
         child: FutureBuilder<List<TempatWisataModel>>(
-          future: _futureFavorit,
+          future: _futureFavorit, // (PERBAIKAN)
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const LoadingWidget(message: 'Memuat data favorit...');

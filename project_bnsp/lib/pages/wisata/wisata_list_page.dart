@@ -1,12 +1,15 @@
+// lib/pages/wisata/wisata_list_page.dart
+// (VERSI PERBAIKAN)
+
 import 'package:flutter/material.dart';
 import '../../models/kota_model.dart';
 import '../../models/wisata_model.dart';
 import '../../services/api_service.dart';
 import '../../widgets/loading_widget.dart';
-import '../../widgets/wisata_card.dart'; 
+import '../../widgets/wisata_card.dart';
 
 class WisataListPage extends StatefulWidget {
-  final KotaModel? kota; // Opsional, jika difilter berdasarkan kota
+  final KotaModel? kota;
 
   const WisataListPage({super.key, this.kota});
 
@@ -15,46 +18,53 @@ class WisataListPage extends StatefulWidget {
 }
 
 class _WisataListPageState extends State<WisataListPage> {
-  late Future<List<TempatWisataModel>> _futureWisata;
+  // 'late' dihapus, kita inisialisasi di initState
+  Future<List<TempatWisataModel>>? _futureWisata;
   final ApiService _apiService = ApiService();
-  List<int> _favoritIds = [];
 
   @override
   void initState() {
     super.initState();
-    _loadData();
+    // Panggil fungsi _loadData dan langsung assign Future-nya
+    _futureWisata = _loadData();
   }
 
-  // Memuat data wisata dan data favorit untuk sinkronisasi tombol
-  Future<void> _loadData() async {
+  Future<List<TempatWisataModel>> _loadData() async {
     // 1. Ambil data favorit dulu untuk tahu mana yang sudah disukai
+    List<int> favoritIds = [];
     try {
       final favoritList = await _apiService.getFavorit();
-      _favoritIds = favoritList.map((w) => w.id).toList();
+      favoritIds = favoritList.map((w) => w.id).toList();
     } catch (e) {
       // Gagal ambil favorit tidak masalah, anggap saja belum ada
-      _favoritIds = [];
+      favoritIds = [];
     }
-    
-    // 2. Ambil data wisata
-    _futureWisata = _apiService.getWisata(kotaId: widget.kota?.id);
 
-    // 3. Update state
-    if (mounted) {
-      setState(() {});
+    // 2. Ambil data wisata
+    final wisataList =
+        await _apiService.getWisata(kotaId: widget.kota?.id);
+
+    // 3. Sinkronkan status favorit
+    for (var wisata in wisataList) {
+      wisata.isFavorit = favoritIds.contains(wisata.id);
     }
+
+    // 4. Kembalikan list yang sudah lengkap
+    return wisataList;
   }
 
+  // (PERBAIKAN) _onRetry harus me-reset Future
   void _onRetry() {
     setState(() {
-      _loadData();
+      _futureWisata = _loadData();
     });
   }
-  
-  // Fungsi untuk refresh (dipanggil oleh WisataCard)
+
+  // (PERBAIKAN) _onFavoritChanged juga harus me-reset Future
   void _onFavoritChanged() {
-    // Muat ulang data favorit untuk update status UI
-    _loadData();
+    setState(() {
+      _futureWisata = _loadData();
+    });
   }
 
   @override
@@ -80,12 +90,8 @@ class _WisataListPageState extends State<WisataListPage> {
               return const EmptyWidget(message: 'Tidak ada tempat wisata');
             }
 
+            // Data sudah aman di sini
             final wisataList = snapshot.data!;
-            
-            // Sinkronkan status favorit
-            for (var wisata in wisataList) {
-              wisata.isFavorit = _favoritIds.contains(wisata.id);
-            }
 
             return ListView.builder(
               padding: const EdgeInsets.all(16),
@@ -94,7 +100,7 @@ class _WisataListPageState extends State<WisataListPage> {
                 final wisata = wisataList[index];
                 return WisataCard(
                   wisata: wisata,
-                  onFavoritChanged: _onFavoritChanged, // Kirim callback
+                  onFavoritChanged: _onFavoritChanged,
                 );
               },
             );

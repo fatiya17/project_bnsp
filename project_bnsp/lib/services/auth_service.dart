@@ -4,8 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
 
 class AuthService {
-  // Ganti URL ini dengan URL API Laravel Anda
-  // (Jika pakai emulator Android, gunakan 10.0.2.2)
   static const String _baseUrl = 'http://10.0.2.2:8000/api';
   static const String _tokenKey = 'authToken';
 
@@ -27,11 +25,11 @@ class AuthService {
     await prefs.remove(_tokenKey);
   }
 
-  // [BARU] Helper untuk mendapatkan header otentikasi
+  // Helper untuk mendapatkan header otentikasi
   Future<Map<String, String>> getAuthHeaders() async {
     final token = await getToken();
     return {
-      'Content-Type': 'application/json; charset=UTF-O',
+      'Content-Type': 'application/json; charset=UTF-8', 
       'Accept': 'application/json',
       'Authorization': 'Bearer $token',
     };

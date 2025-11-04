@@ -1,6 +1,3 @@
-// lib/pages/wisata/wisata_list_page.dart
-// (VERSI PERBAIKAN)
-
 import 'package:flutter/material.dart';
 import '../../models/kota_model.dart';
 import '../../models/wisata_model.dart';
@@ -18,7 +15,6 @@ class WisataListPage extends StatefulWidget {
 }
 
 class _WisataListPageState extends State<WisataListPage> {
-  // 'late' dihapus, kita inisialisasi di initState
   Future<List<TempatWisataModel>>? _futureWisata;
   final ApiService _apiService = ApiService();
 
@@ -53,14 +49,14 @@ class _WisataListPageState extends State<WisataListPage> {
     return wisataList;
   }
 
-  // (PERBAIKAN) _onRetry harus me-reset Future
+  // _onRetry harus me-reset Future
   void _onRetry() {
     setState(() {
       _futureWisata = _loadData();
     });
   }
 
-  // (PERBAIKAN) _onFavoritChanged juga harus me-reset Future
+  //  _onFavoritChanged juga harus me-reset Future
   void _onFavoritChanged() {
     setState(() {
       _futureWisata = _loadData();

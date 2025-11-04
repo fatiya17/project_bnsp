@@ -71,17 +71,12 @@ class _WisataCardState extends State<WisataCard> {
 
   @override
   Widget build(BuildContext context) {
-    // Sinkronkan state jika widget di-rebuild (penting untuk FavoritPage)
     _isFavorit = widget.wisata.isFavorit;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       child: InkWell(
         onTap: () {
-          // Arahkan ke halaman detail jika ada
-          // Navigator.pushNamed(context, AppRoutes.wisataDetail, arguments: widget.wisata);
-          
-          // Untuk saat ini, tampilkan dialog detail sederhana
           showDialog(
             context: context,
             builder: (context) => AlertDialog(

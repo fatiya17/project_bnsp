@@ -21,7 +21,6 @@ class BottomNavBar extends StatelessWidget {
       selectedIndex: currentIndex,
       onDestinationSelected: onTap,
       
-      // (PDF) Ganti destinasi
       destinations: const [
         NavigationDestination(
           icon: Icon(Icons.location_city_outlined),

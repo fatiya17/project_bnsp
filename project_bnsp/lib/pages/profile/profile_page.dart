@@ -78,7 +78,6 @@ class _ProfilePageState extends State<ProfilePage> {
         newColor = Colors.green.shade100;
       } else {
         // Posisi tengah
-        // (PERBAIKAN LINT) Cek 'mounted' sebelum akses 'Theme.of(context)' di async gap
         if (mounted) {
           newColor = Theme.of(context).scaffoldBackgroundColor;
         }
@@ -92,7 +91,7 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
-  // (PDF) Fungsi untuk Info Perangkat
+  // Fungsi untuk Info Perangkat
   Future<void> _loadDeviceInfo() async {
     final deviceInfo = DeviceInfoPlugin();
     String deviceName = 'Unknown';
@@ -120,13 +119,13 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  // (PDF) Fungsi untuk Info Koneksi (saat awal)
+  // Fungsi untuk Info Koneksi (saat awal)
   Future<void> _checkInitialConnection() async {
     final result = await Connectivity().checkConnectivity();
     _updateConnectionStatus(result);
   }
 
-  // (PDF) Fungsi untuk Info Koneksi (listener)
+  // Fungsi untuk Info Koneksi (listener)
   void _updateConnectionStatus(List<ConnectivityResult> results) {
     String status;
     if (results.contains(ConnectivityResult.mobile)) {
@@ -157,7 +156,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // (PDF) Latar belakang berubah berdasarkan sensor
+    // Latar belakang berubah berdasarkan sensor
     return Scaffold(
       backgroundColor: _sensorColor,
       appBar: AppBar(title: const Text('Profil Saya'), centerTitle: true),
@@ -192,7 +191,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           const SizedBox(height: 24),
 
-          // --- Nama & Email (Sesuaikan dengan model baru) ---
+          // --- Nama & Email ---
           Text(
             user!.username, // Ganti dari name ke username
             style: theme.textTheme.displaySmall?.copyWith(
@@ -227,7 +226,7 @@ class _ProfilePageState extends State<ProfilePage> {
           const Divider(),
           const SizedBox(height: 16),
 
-          // --- (PDF) Info Perangkat ---
+          // --- Info Perangkat ---
           Text(
             'Info Perangkat & Jaringan',
             style: Theme.of(context).textTheme.titleLarge,
@@ -235,7 +234,7 @@ class _ProfilePageState extends State<ProfilePage> {
           const SizedBox(height: 16),
           _buildInfoItem(
             icon: Icons.smartphone,
-            label: 'Nama Perangkat', // (Sesuai PDF)
+            label: 'Nama Perangkat', 
             value: _deviceName,
             context: context,
           ),
@@ -249,7 +248,7 @@ class _ProfilePageState extends State<ProfilePage> {
             icon: _connectionStatus == 'Offline'
                 ? Icons.signal_wifi_off
                 : Icons.signal_wifi_4_bar,
-            label: 'Koneksi Internet', // (Sesuai PDF)
+            label: 'Koneksi Internet', 
             value: _connectionStatus,
             context: context,
           ),
@@ -298,7 +297,6 @@ class _ProfilePageState extends State<ProfilePage> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            // (PERBAIKAN LINT) Mengganti 'withOpacity' yang deprecated
             color: Colors.black.withAlpha((255 * 0.05).round()),
             blurRadius: 4,
             offset: const Offset(0, 2),
@@ -350,7 +348,6 @@ class _ProfilePageState extends State<ProfilePage> {
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
             ),
-            // (PERBAIKAN LINT) Perbaikan untuk 'use_build_context_synchronously'
             onPressed: () async {
               // Simpan navigator dan auth service sebelum async gap
               final navigator = Navigator.of(context);

@@ -1,151 +1,78 @@
-// import 'dart:convert';
-// import 'package:http/http.dart' as http;
-import '../models/user_model.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'auth_service.dart';
+import '../models/kota_model.dart';
+import '../models/wisata_model.dart';
 
 class ApiService {
-  // Ganti dengan URL API Anda
-  static const String baseUrl = 'https://your-api.com/api';
-  
-  // GET: Fetch products
-  Future<List<ProductModel>> getProducts() async {
-    try {
-      // Simulasi delay
-      await Future.delayed(const Duration(seconds: 1));
-      
-      // CONTOH: Ganti dengan API call sebenarnya
-      /*
-      final response = await http.get(
-        Uri.parse('$baseUrl/products'),
-        headers: {'Content-Type': 'application/json'},
-      );
+  static const String _baseUrl = 'http://10.0.2.2:8000/api';
+  final AuthService _authService = AuthService();
 
-      if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body);
-        return data.map((json) => ProductModel.fromJson(json)).toList();
-      }
-      throw Exception('Failed to load products');
-      */
-      
-      // Data dummy untuk testing
-      return [
-        ProductModel(
-          id: '1',
-          name: 'Product 1',
-          description: 'Deskripsi product 1 yang sangat menarik',
-          price: 100000,
-          stock: 10,
-          image: 'https://via.placeholder.com/300',
-        ),
-        ProductModel(
-          id: '2',
-          name: 'Product 2',
-          description: 'Deskripsi product 2 yang berkualitas',
-          price: 200000,
-          stock: 5,
-          image: 'https://via.placeholder.com/300',
-        ),
-        ProductModel(
-          id: '3',
-          name: 'Product 3',
-          description: 'Deskripsi product 3 yang terbaik',
-          price: 150000,
-          stock: 8,
-          image: 'https://via.placeholder.com/300',
-        ),
-      ];
-    } catch (e) {
-      throw Exception('Error fetching products: $e');
+  // GET: /kota
+  Future<List<KotaModel>> getKota() async {
+    final headers = await _authService.getAuthHeaders();
+    final response = await http.get(Uri.parse('$_baseUrl/kota'), headers: headers);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body)['data'] as List;
+      return data.map((json) => KotaModel.fromJson(json)).toList();
+    } else {
+      throw Exception('Gagal memuat data kota');
     }
   }
 
-  // GET: Fetch single product
-  Future<ProductModel> getProduct(String id) async {
-    try {
-      await Future.delayed(const Duration(seconds: 1));
-      
-      /*
-      final response = await http.get(
-        Uri.parse('$baseUrl/products/$id'),
-        headers: {'Content-Type': 'application/json'},
-      );
+  // GET: /wisata
+  Future<List<TempatWisataModel>> getWisata({int? kotaId}) async {
+    final headers = await _authService.getAuthHeaders();
+    String url = '$_baseUrl/wisata';
+    if (kotaId != null) {
+      url += '?kota_id=$kotaId'; // Filter berdasarkan kota
+    }
 
-      if (response.statusCode == 200) {
-        return ProductModel.fromJson(jsonDecode(response.body));
-      }
-      throw Exception('Failed to load product');
-      */
-      
-      return ProductModel(
-        id: id,
-        name: 'Product $id',
-        description: 'Detailed description',
-        price: 100000,
-        stock: 10,
-      );
-    } catch (e) {
-      throw Exception('Error fetching product: $e');
+    final response = await http.get(Uri.parse(url), headers: headers);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body)['data'] as List;
+      return data.map((json) => TempatWisataModel.fromJson(json)).toList();
+    } else {
+      throw Exception('Gagal memuat data wisata');
     }
   }
 
-  // POST: Create product
-  Future<bool> addProduct(ProductModel product) async {
-    try {
-      await Future.delayed(const Duration(seconds: 1));
-      
-      /*
-      final response = await http.post(
-        Uri.parse('$baseUrl/products'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(product.toJson()),
-      );
+  // --- API FAVORIT ---
 
-      return response.statusCode == 201;
-      */
-      print('Produk ditambahkan: ${product.name}');
-      return true;
-    } catch (e) {
-      throw Exception('Error creating product: $e');
+  // GET: /favorit
+  Future<List<TempatWisataModel>> getFavorit() async {
+    final headers = await _authService.getAuthHeaders();
+    final response = await http.get(Uri.parse('$_baseUrl/favorit'), headers: headers);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body)['data'] as List;
+      // Data favorit adalah list TempatWisataModel
+      return data.map((json) => TempatWisataModel.fromJson(json)).toList();
+    } else {
+      throw Exception('Gagal memuat data favorit');
     }
   }
 
-  // PUT: Update product
-  Future<bool> updateProduct(String id, ProductModel product) async {
-    try {
-      await Future.delayed(const Duration(seconds: 1));
-      
-      /*
-      final response = await http.put(
-        Uri.parse('$baseUrl/products/$id'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(product.toJson()),
-      );
-
-      return response.statusCode == 200;
-      */
-      
-      return true;
-    } catch (e) {
-      throw Exception('Error updating product: $e');
-    }
+  // POST: /favorit
+  Future<bool> addFavorit(int wisataId) async {
+    final headers = await _authService.getAuthHeaders();
+    final response = await http.post(
+      Uri.parse('$_baseUrl/favorit'),
+      headers: headers,
+      body: jsonEncode({'tempat_wisata_id': wisataId}),
+    );
+    return response.statusCode == 201;
   }
 
-  // DELETE: Delete product
-  Future<bool> deleteProduct(String id) async {
-    try {
-      await Future.delayed(const Duration(seconds: 1));
-      
-      /*
-      final response = await http.delete(
-        Uri.parse('$baseUrl/products/$id'),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      return response.statusCode == 200;
-      */
-      
-      return true;
-    } catch (e) {
-      throw Exception('Error deleting product: $e');
-    }
+  // DELETE: /favorit/{id_wisata}
+  Future<bool> removeFavorit(int wisataId) async {
+    final headers = await _authService.getAuthHeaders();
+    final response = await http.delete(
+      Uri.parse('$_baseUrl/favorit/$wisataId'),
+      headers: headers,
+    );
+    return response.statusCode == 200;
   }
 }

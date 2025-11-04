@@ -17,6 +17,7 @@ class LoadingWidget extends StatelessWidget {
             Text(
               message!,
               style: Theme.of(context).textTheme.bodyMedium,
+              textAlign: TextAlign.center,
             ),
           ],
         ],
@@ -25,11 +26,12 @@ class LoadingWidget extends StatelessWidget {
   }
 }
 
-class ErrorWidget extends StatelessWidget {
+// Ganti nama ErrorWidget menjadi CustomErrorWidget
+class CustomErrorWidget extends StatelessWidget {
   final String message;
   final VoidCallback? onRetry;
 
-  const ErrorWidget({
+  const CustomErrorWidget({
     super.key,
     required this.message,
     this.onRetry,

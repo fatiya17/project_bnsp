@@ -20,27 +20,28 @@ class BottomNavBar extends StatelessWidget {
       indicatorColor: AppTheme.primaryColor.withAlpha((255 * 0.15).round()),
       selectedIndex: currentIndex,
       onDestinationSelected: onTap,
+      
+      // (PDF) Ganti destinasi
       destinations: const [
         NavigationDestination(
-          icon: Icon(Icons.home_outlined),
-          selectedIcon: Icon(Icons.home, color: AppTheme.primaryColor),
-          label: 'Home',
-        ),
-        // add production
-         NavigationDestination(
-          icon: Icon(Icons.add_circle_outline_rounded),
-          selectedIcon: Icon(Icons.add_circle_rounded, color: AppTheme.primaryColor),
-          label: 'Add', 
+          icon: Icon(Icons.location_city_outlined),
+          selectedIcon: Icon(Icons.location_city, color: AppTheme.primaryColor),
+          label: 'Kota', // Halaman Pilih Kota
         ),
         NavigationDestination(
-          icon: Icon(Icons.shopping_cart_outlined),
-          selectedIcon: Icon(Icons.shopping_cart, color: AppTheme.primaryColor),
-          label: 'Cart',
+          icon: Icon(Icons.explore_outlined),
+          selectedIcon: Icon(Icons.explore, color: AppTheme.primaryColor),
+          label: 'Wisata', // Halaman Daftar Wisata
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.favorite_border),
+          selectedIcon: Icon(Icons.favorite, color: AppTheme.primaryColor),
+          label: 'Favorit', // Halaman Daftar Favorite
         ),
         NavigationDestination(
           icon: Icon(Icons.person_outline),
           selectedIcon: Icon(Icons.person, color: AppTheme.primaryColor),
-          label: 'Profile',
+          label: 'Profil',
         ),
       ],
     );

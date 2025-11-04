@@ -14,7 +14,7 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _authService = AuthService();
-  
+
   bool _isLoading = false;
   bool _obscurePassword = true;
 
@@ -31,17 +31,21 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _isLoading = true);
 
     try {
-      final success = await _authService.login(
+      // Panggil service login yang baru
+      final result = await _authService.login(
         _emailController.text,
         _passwordController.text,
       );
 
       if (mounted) {
-        if (success) {
+        if (result['success'] == true) {
+          // Navigasi ke halaman utama (MainLayout)
           Navigator.pushReplacementNamed(context, AppRoutes.main);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Login gagal. Periksa email dan password.')),
+            SnackBar(
+                content: Text(
+                    'Login gagal: ${result['message'] ?? 'Periksa email dan password.'}')),
           );
         }
       }
@@ -56,9 +60,9 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  // Tampilan Halaman Login
   @override
   Widget build(BuildContext context) {
+    // UI Halaman Login (bisa tetap sama)
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -82,7 +86,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Masuk ke akun Anda',
+                  'Masuk ke Akun Info Wisata Anda',
                   style: Theme.of(context).textTheme.bodyLarge,
                   textAlign: TextAlign.center,
                 ),
@@ -115,7 +119,9 @@ class _LoginPageState extends State<LoginPage> {
                     prefixIcon: const Icon(Icons.lock_outlined),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                        _obscurePassword
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
                       ),
                       onPressed: () {
                         setState(() => _obscurePassword = !_obscurePassword);
@@ -126,10 +132,7 @@ class _LoginPageState extends State<LoginPage> {
                     if (value == null || value.isEmpty) {
                       return 'Password tidak boleh kosong';
                     }
-                    if (value.length < 6) {
-                      return 'Password minimal 6 karakter';
-                    }
-                    return null;
+                    return null; // Validasi panjang dihapus agar cocok dgn backend
                   },
                 ),
                 const SizedBox(height: 24),

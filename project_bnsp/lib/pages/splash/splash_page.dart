@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/routes/routes.dart';
+import '../../services/auth_service.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -12,18 +13,39 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    _navigateToLogin();
+    _checkAuthStatus(); // Ganti fungsi navigasi
   }
 
-  Future<void> _navigateToLogin() async {
-    await Future.delayed(const Duration(seconds: 3));
+  Future<void> _checkAuthStatus() async {
+    // Tunggu 2 detik untuk efek splash
+    await Future.delayed(const Duration(seconds: 2));
+
+    final authService = AuthService();
+    final token = await authService.getToken();
+
     if (mounted) {
-      Navigator.pushReplacementNamed(context, AppRoutes.login);
+      if (token != null) {
+        // Jika ada token, coba ambil data user
+        final user = await authService.getCurrentUser();
+        if (user != null) {
+          // Token valid, user ada, masuk ke menu utama
+          // ignore: use_build_context_synchronously
+          Navigator.pushReplacementNamed(context, AppRoutes.main);
+        } else {
+          // Token mungkin kadaluarsa, ke login
+          // ignore: use_build_context_synchronously
+          Navigator.pushReplacementNamed(context, AppRoutes.login);
+        }
+      } else {
+        // Tidak ada token, ke login
+        Navigator.pushReplacementNamed(context, AppRoutes.login);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // UI bisa tetap sama, tapi ganti icon dan teks
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -41,13 +63,13 @@ class _SplashPageState extends State<SplashPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.mobile_friendly,
+              Icons.explore_outlined, // Ganti Icon
               size: 100,
               color: Colors.white,
             ),
             const SizedBox(height: 24),
             Text(
-              'BNSP Mobile App',
+              'Info Wisata', // Ganti Teks
               style: Theme.of(context).textTheme.displayMedium?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -55,7 +77,7 @@ class _SplashPageState extends State<SplashPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Selamat Datang',
+              'Tugas Praktik JMP', // Ganti Teks
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     color: Colors.white70,
                   ),

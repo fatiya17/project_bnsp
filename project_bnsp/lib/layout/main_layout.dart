@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import '../layout/bottom_nav_bar.dart';
-import 'app_drawer.dart';
-import '../pages/home/home_page.dart';
-import '../pages/cart/cart_page.dart';
+// Halaman baru
+import '../pages/kota/pilih_kota_page.dart';
+import '../pages/wisata/wisata_list_page.dart';
+import '../pages/wisata/favorit_page.dart';
 import '../pages/profile/profile_page.dart';
-import '../pages/product/add_product_page.dart';
+
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -16,11 +17,12 @@ class MainLayout extends StatefulWidget {
 class _MainLayoutState extends State<MainLayout> {
   int _currentIndex = 0;
 
+  // (PDF) Ganti daftar halaman
   final List<Widget> _pages = [
-    HomePage(),
-    AddProductPage(),
-    CartPage(),
-    ProfilePage(),
+    const PilihKotaPage(), // Index 0: Halaman Pilih Kota
+    const WisataListPage(), // Index 1: Halaman Daftar Wisata (Semua)
+    const FavoritPage(), // Index 2: Halaman Daftar Favorite
+    const ProfilePage(), // Index 3: Profil (dengan info PDF)
   ];
 
   void _onTabTapped(int index) {
@@ -31,10 +33,12 @@ class _MainLayoutState extends State<MainLayout> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_currentIndex],
-      drawer: AppDrawer(
-        currentIndex: _currentIndex,
-        onItemTapped: _onTabTapped, // Gunakan fungsi yang sama dengan BottomNavBar
-      ),
+      // Drawer bisa dihapus jika tidak diperlukan,
+      // tapi file 'app_drawer.dart' tidak perlu diubah jika masih ingin dipakai.
+      // drawer: AppDrawer(
+      //   currentIndex: _currentIndex,
+      //   onItemTapped: _onTabTapped,
+      // ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: _currentIndex,
         onTap: _onTabTapped,

@@ -10,19 +10,20 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
+  // Ganti _nameController menjadi _usernameController
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _authService = AuthService();
-  
+
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -35,21 +36,24 @@ class _RegisterPageState extends State<RegisterPage> {
     setState(() => _isLoading = true);
 
     try {
-      final success = await _authService.register(
-        _nameController.text,
+      // Panggil service register yang baru
+      final result = await _authService.register(
+        _usernameController.text,
         _emailController.text,
         _passwordController.text,
       );
 
       if (mounted) {
-        if (success) {
+        if (result['success'] == true) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Registrasi berhasil! Silakan login.')),
           );
-          Navigator.pop(context);
+          Navigator.pop(context); // Kembali ke halaman login
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Registrasi gagal. Silakan coba lagi.')),
+            SnackBar(
+                content: Text(
+                    'Registrasi gagal: ${result['message'] ?? 'Silakan coba lagi.'}')),
           );
         }
       }
@@ -64,7 +68,6 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
-  // Tampilan halaman registrasi
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,6 +82,7 @@ class _RegisterPageState extends State<RegisterPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // ... (Icon dan Teks 'Buat Akun Baru' bisa tetap)
                 const SizedBox(height: 24),
                 Icon(
                   Icons.person_add_outlined,
@@ -92,21 +96,25 @@ class _RegisterPageState extends State<RegisterPage> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
+                
+                // Field Username (Menggantikan Nama Lengkap)
                 TextFormField(
-                  controller: _nameController,
+                  controller: _usernameController,
                   decoration: const InputDecoration(
-                    labelText: 'Nama Lengkap',
-                    hintText: 'Masukkan nama lengkap',
+                    labelText: 'Username',
+                    hintText: 'Masukkan username',
                     prefixIcon: Icon(Icons.person_outlined),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Nama tidak boleh kosong';
+                      return 'Username tidak boleh kosong';
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
+                
+                // Field Email
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -126,16 +134,20 @@ class _RegisterPageState extends State<RegisterPage> {
                   },
                 ),
                 const SizedBox(height: 16),
+                
+                // Field Password
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
                   decoration: InputDecoration(
                     labelText: 'Password',
-                    hintText: 'Masukkan password',
+                    hintText: 'Masukkan password (min. 8 karakter)',
                     prefixIcon: const Icon(Icons.lock_outlined),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                        _obscurePassword
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
                       ),
                       onPressed: () {
                         setState(() => _obscurePassword = !_obscurePassword);
@@ -146,13 +158,15 @@ class _RegisterPageState extends State<RegisterPage> {
                     if (value == null || value.isEmpty) {
                       return 'Password tidak boleh kosong';
                     }
-                    if (value.length < 6) {
-                      return 'Password minimal 6 karakter';
+                    if (value.length < 8) {
+                      return 'Password minimal 8 karakter';
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
+
+                // Field Konfirmasi Password
                 TextFormField(
                   controller: _confirmPasswordController,
                   obscureText: _obscureConfirmPassword,
@@ -162,10 +176,13 @@ class _RegisterPageState extends State<RegisterPage> {
                     prefixIcon: const Icon(Icons.lock_outlined),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscureConfirmPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                        _obscureConfirmPassword
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
                       ),
                       onPressed: () {
-                        setState(() => _obscureConfirmPassword = !_obscureConfirmPassword);
+                        setState(() => _obscureConfirmPassword =
+                            !_obscureConfirmPassword);
                       },
                     ),
                   ),
@@ -180,6 +197,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   },
                 ),
                 const SizedBox(height: 24),
+                
+                // Tombol Daftar
                 ElevatedButton(
                   onPressed: _isLoading ? null : _handleRegister,
                   child: _isLoading

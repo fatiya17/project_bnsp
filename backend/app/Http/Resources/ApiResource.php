@@ -9,26 +9,34 @@ class ApiResource extends JsonResource
 {
     public $status;
     public $message;
+
+    /**
+     * Buat instance resource baru.
+     *
+     * @param bool   $status
+     * @param string $message
+     * @param mixed  $resource
+     * @return void
+     */
+    public function __construct($status, $message, $resource)
+    {
+        parent::__construct($resource); 
+        
+        $this->status = $status;
+        $this->message = $message;
+    }
+
     /**
      * Transform the resource into an array.
      *
      * @return array<string, mixed>
      */
-    public function __construct($status, $message, $resource)
-    {
-        // inisialisasi properti
-        $this->status = $status;
-        $this->message = $message;
-        $this->resource = $resource;
-    }
-
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
         return [
             'success' => $this->status,
             'message' => $this->message,
-            'data' => $this->resource,
+            'data'    => parent::toArray($request),
         ];
     }
 }
